@@ -16,4 +16,13 @@ ANN使用類別分成兩部分
 ### NNlayers
 此類別可宣告單一層神經網路，宣告如下
 
-  NNlayers N1 = new NNlayers(NNlayers.Layers_family.Affine, input, numHidden);
+    NNlayers layer1 = new NNlayers(NNlayers.Layers_family.Affine, input1, output1);
+
+Layers_family可選擇這層的特性，後兩項參數選擇此層的輸入與輸出神經元數量。
+可經由反覆宣告多層的NNlayers，並以Array包住，即可完成一份簡單的直線狀網路結構。
+
+### NeualNetwork
+此類別為主要計算類別，將上述的NNlayers Array輸入後即可完成一份完整的ANN計算單位，並透過調整參數、匯入數據來完成幾項工作
+1. Train Model
+2. Improve Model
+兩種宣告過程不同
