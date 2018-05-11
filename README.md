@@ -1,5 +1,3 @@
-# Ann_Example
-The First Example for ANN library
 
 ## 函式庫介紹
 MatsurikaG.dll 函式庫(以下簡稱本庫) 為專輔助於處理演算平台開發之類別函式庫，
@@ -12,7 +10,10 @@ MatsurikaG.dll 函式庫(以下簡稱本庫) 為專輔助於處理演算平台�
 
 ## 使用 ANN 類別
 ANN使用類別分成兩部分
-1 NNlayers 
-2 NeualNetwork
+1. NNlayers 
+2. NeualNetwork
 
 ### NNlayers
+此類別可宣告單一層神經網路，宣告如下
+
+  NNlayers N1 = new NNlayers(NNlayers.Layers_family.Affine, input, numHidden);
