@@ -29,5 +29,5 @@ Layers_family可選擇這層的特性，後兩項參數選擇此層的輸入與�
 
 #### Train Model
 
-```Ann = new ArtificialNeuralNetwork(NNlayers Array, input, output);
-Ann.TrainModel(Data, maxEpochs, learnRate, 0);```
+```Ann = new ArtificialNeuralNetwork(NNlayers Array, input, output);```
+```Ann.TrainModel(Data, maxEpochs, learnRate, 0);```
