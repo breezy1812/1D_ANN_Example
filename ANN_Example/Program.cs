@@ -39,7 +39,7 @@ namespace ANN_Example
                     else
                     {
                         double[] temp = new double[input + output];
-                        
+                        //輸入在前、輸出在後，以array堆疊數據總長度
                         for (int i  = 0; i < temp.Length; i++)
                             temp[i] = Convert.ToDouble(pline[i]);
 
