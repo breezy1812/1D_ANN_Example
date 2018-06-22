@@ -18,19 +18,19 @@ ANN使用類別分成兩部分
 利用`NNlayers`類別，我們可先嘗試宣告單一層神經網路，舉例宣告如下
 
 ```
-NNlayers layer1 = new NNlayers(NNlayers.Layers_family.Affine, Num_Input1, Num_Output1);
+NNlayers layer1 = new NNlayers(NNlayers.Layers_family.Affine, Num_Input, Num_Output);
 ```
 
-`Layers_family`是我們預設好的一群列舉，可在其中選擇一項當作該層屬性，
-後兩項參數 `Num_Input1` 、 `Num_Output1` 為此層的輸入與輸出神經元數量。
+`Layers_family`是我們在本庫預設好的一群列舉，可在其中選擇一項當作該層屬性，
+後兩項參數 `Num_Input` 、 `Num_Output` 為此層的輸入與輸出神經元數量。
 可經由反覆宣告多層的`NNlayers`，並以`Array`包住，即可完成一份簡單的直線狀網路結構。
 舉例如下:
 
      List<NNlayers> Nlist = new List<NNlayers>();
-     NNlayers N1 = new NNlayers(NNlayers.Layers_family.Affine, input, numHidden);
+     NNlayers N1 = new NNlayers(NNlayers.Layers_family.Affine, Num_Input, numHidden);
      NNlayers N2 = new NNlayers(NNlayers.Layers_family.BN, numHidden, numHidden);
      NNlayers N3 = new NNlayers(NNlayers.Layers_family.ReLU, numHidden, numHidden);
-     NNlayers N4 = new NNlayers(NNlayers.Layers_family.Affine, numHidden, numHidden2);
+     NNlayers N4 = new NNlayers(NNlayers.Layers_family.Affine, numHidden, Num_Output);
            
      Nlist.Add(N1);
      Nlist.Add(N2);
@@ -52,7 +52,7 @@ NNlayers layer1 = new NNlayers(NNlayers.Layers_family.Affine, Num_Input1, Num_Ou
 在一開始，我們必須呼叫出一個學習核心，該核心內要輸入上一步驟所建立的`ANNarray`。
 以及輸入及輸出的維度。
 
-    Ann = new ArtificialNeuralNetwork(ANNarray, input, output);
+    Ann = new ArtificialNeuralNetwork(ANNarray, Num_iutput, Num_output);
     
 之後開始調整參數
 
@@ -76,7 +76,7 @@ Ann.Batchratio = 1; // default = 0.2
 
 #### Improve Model
 
-優化模式底下我們使用前必須確認有"待優化模型"以供優化，此模型必須是本函式庫輸出之模型。
+優化模式底下我們使用前必須確認有"待優化模型"以供優化，此模型必須是本庫輸出之模型。
 
 一開始我們已多型去宣告一個無NN架構的運算核心:
 
@@ -86,22 +86,21 @@ Ann.Batchratio = 1; // default = 0.2
 
     Ann.ImportOldProject(old_project_path);
 
-之後就和尚步驟類似，不同於最後要優化所使用的函式。
+之後就和上步驟類似，不同在最後要優化所使用的函式。
 這邊我們為了讓使用者可以在優化過程接受更多的輸出結果，讓建模更有彈性。
-
 
     Ann.ImproveModel(Data, maxEpochs, learnRate, 0);
 
 ### Save Model by manual
 
-訓練或是優化完後，如果想將此次模型保留下來，可將訓練好的模型進行儲存一套計畫
-儲存的方式為
+訓練或是優化完後，如果想將此次模型保留下來，可將訓練好的模型進行儲存成一套計畫
+儲存在自訂義的資料夾 `project_path`
 
 ```
 Ann.Save_network(project_path, learnRate);
 Ann.Save_H5files(project_path);
 ```
-儲存成功後會在儲存目錄底下發現一個具有當下時間的新資料夾 `yyMMddHHmm_learnproj`，裡面包含一份架構檔以及參數檔。
+儲存成功後會在儲存目錄底下發現一份架構檔以及參數檔。兩者盡量放在同一個資料夾底下以免跟其他模型發生衝突。
 詳細的代碼可參考資料夾中的cs檔。    
 
 ### Compute test data
