@@ -65,6 +65,13 @@ Ann.Batchratio = 1; // default = 0.2
 調整完後即可輸入數據執行訓練。
 數據的輸入是將各筆的輸入輸出合併成一個1D array，輸出放在輸入後方。
 
+    double[][] Data = new double[data_size][];
+    for(int i = 0 ; i < data_size ; i++)
+    {
+          Data[i] = new double[Num_input + Num_output];
+          Array.Copy(Input[i], Data[i], Num_input);
+          Array.Copy(Output[i], 0 , Data[i], Num_input, Num_output);
+    }
     Ann.TrainModel(Data, maxEpochs, learnRate, 0);
 
 #### Improve Model
