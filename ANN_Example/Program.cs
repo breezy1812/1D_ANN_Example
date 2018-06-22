@@ -51,7 +51,7 @@ namespace ANN_Example
                 }
                 Data = _data.ToArray();
                 Console.WriteLine("Welcome to ANN .NET library. \nChoose a function next. " +
-                    "\n1 = Tran \n2 = Improve");
+                    "\n1 = Tran \n2 = Improve \n3 = Compute");
 
                 string index = Console.ReadLine();
                 switch(Convert.ToInt32(index))
@@ -64,6 +64,11 @@ namespace ANN_Example
                     case 2:
                         {
                             Improve(Data, input, output);
+                            break;
+                        }
+                    case 3:
+                        {
+                            Compute(Data, Rawdata, framesize, framesize, delta.ToArray(), offset.ToArray(), peak.ToArray());
                             break;
                         }
                 }
@@ -190,8 +195,72 @@ namespace ANN_Example
             Console.Write("\nVariables have been save in " + site);
             
         }
+        
+        static private void Compute(double[][] Data, double[][] Raw, int input, int output, double[] delta, double[] offset, int[] peak)
+        {
+            //create a NN class
+            Ann = new ArtificialNeuralNetwork(input, output);
+            Ann.PositiveLimit = 0.5;//default = 0.7
+            DirectoryInfo di = new DirectoryInfo(System.Environment.CurrentDirectory);
 
-            static private void backgroundWorker_NN_DoWork(object sender, DoWorkEventArgs e)
+            int date = 0;
+            string path = "";
+            List<string> projects = new List<string>();
+
+            Console.WriteLine("\nChoose a learning project:");
+            int N = 0;
+            foreach (var fi in di.GetDirectories())
+            {
+                if (fi.Name.Contains("learnproj"))
+                {
+                    projects.Add(fi.Name);
+                    Console.WriteLine(N + " = " + fi.Name);
+                    N++;
+                }
+            }
+            if (N == 0)
+            {
+                Console.Write("\nCannot Find any learnproject");
+                return;
+            }
+            string n = Console.ReadLine();
+            bool error = Ann.ImportOldProject(projects[Convert.ToInt32(n)]);
+            if (!error)
+            {
+                Console.Write("\nCannot import learnproject");
+                return;
+            }
+
+            string site = System.DateTime.Now.ToString("yyMMddHHmm") + "_Compute.csv";
+            using (StreamWriter SW = new StreamWriter(site))
+            {
+                int i = 0;
+                foreach (double[] temp in Data)
+                {
+
+                    double[] result = new double[framesize];
+                    Array.Copy(temp, result, framesize);
+                    //List<NNlayers> layers = Ann.
+                    result = Ann.Compute(result);
+                    string line = "";
+                    int idx = peak[i] - (int)(framesize/2);
+                    foreach (double t in result)
+                    {
+                        Raw[i][idx] = t * delta[i] + offset[i];
+                        idx++;
+                    }
+                    foreach (double t in Raw[i])
+                        line += t.ToString() + ",";
+                    SW.WriteLine(line);
+                    i++;
+                }
+                SW.Close();
+            }
+
+            Console.Write("\nResult have been save in " + site);
+        }
+        //可用來監測目前error表現的背景程序
+        static private void backgroundWorker_NN_DoWork(object sender, DoWorkEventArgs e)
         {
             int epoch = 0;
 
