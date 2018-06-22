@@ -1,7 +1,7 @@
 
 ## 函式庫介紹
-MatsurikaG.dll 函式庫(以下簡稱本庫) 為專輔助於處理演算平台開發之類別函式庫，
-將常見的一維訊號處理方法彙整並經由類別宣告的形式，簡單實現在軟體及應用程式之中。
+MatsurikaG.dll 函式庫(以下簡稱本庫) 為專輔助於`處理`、`演算`平台開發之類別函式庫，
+將常見的一維訊號處理方法彙整並經由類別宣告的形式，簡單實作在C#開發軟體及平台之中。
 
 ## 函式庫特色
 * 純 C# 開發
@@ -14,52 +14,115 @@ ANN使用類別分成兩部分
 2. NeualNetwork
 
 ### NNlayers
-此類別可宣告單一層神經網路，宣告如下
+在使用一開始，我們要先建構自己的神經網路架構。
+利用`NNlayers`類別，我們可先嘗試宣告單一層神經網路，舉例宣告如下
 
 ```
-NNlayers layer1 = new NNlayers(NNlayers.Layers_family.Affine, input1, output1;
+NNlayers layer1 = new NNlayers(NNlayers.Layers_family.Affine, Num_Input1, Num_Output1);
 ```
 
-Layers_family可選擇這層的特性，後兩項參數選擇此層的輸入與輸出神經元數量。
-可經由反覆宣告多層的NNlayers，並以Array包住，即可完成一份簡單的直線狀網路結構。
+`Layers_family`是我們預設好的一群列舉，可在其中選擇一項當作該層屬性，
+後兩項參數 `Num_Input1` 、 `Num_Output1` 為此層的輸入與輸出神經元數量。
+可經由反覆宣告多層的`NNlayers`，並以`Array`包住，即可完成一份簡單的直線狀網路結構。
+舉例如下:
+
+     List<NNlayers> Nlist = new List<NNlayers>();
+     NNlayers N1 = new NNlayers(NNlayers.Layers_family.Affine, input, numHidden);
+     NNlayers N2 = new NNlayers(NNlayers.Layers_family.BN, numHidden, numHidden);
+     NNlayers N3 = new NNlayers(NNlayers.Layers_family.ReLU, numHidden, numHidden);
+     NNlayers N4 = new NNlayers(NNlayers.Layers_family.Affine, numHidden, numHidden2);
+           
+     Nlist.Add(N1);
+     Nlist.Add(N2);
+     Nlist.Add(N3);
+     Nlist.Add(N4);
+     
+     NNlayers[] ANNarray = Nlist.toArray();
+            
 
 ### NeualNetwork
-此類別為主要學習核心，將上述的NNlayers Array輸入後即可完成一份完整的ANN學習單位，並透過調整參數、匯入數據來完成以下工作
+此類別為主要學習核心，將上述的`ANNarray`輸入後即可完成一份完整的ANN學習單位，並透過調整參數、匯入數據來完成以下工作
 1. Train Model
 2. Improve Model
 
 兩種宣告過程不同
 
 #### Train Model
-使用前必須先將數據修改成特定格式，格式如附件.csv檔以及.cs檔中的程式敘述
+
+在一開始，我們必須呼叫出一個學習核心，該核心內要輸入上一步驟所建立的`ANNarray`。
+以及輸入及輸出的維度。
+
+    Ann = new ArtificialNeuralNetwork(ANNarray, input, output);
+    
+之後開始調整參數
+
 ```
-Ann = new ArtificialNeuralNetwork(NNlayers Array, input, output);
-Ann.TrainModel(Data, maxEpochs, learnRate, 0);
+Ann.PositiveLimit = 0.7;//default = 0.7
+Ann.Batchratio = 1; // default = 0.2
+
 ```
+
+調整完後即可輸入數據執行訓練。
+數據的輸入是將各筆的輸入輸出合併成一個1D array，輸出放在輸入後方。
+
+    Ann.TrainModel(Data, maxEpochs, learnRate, 0);
 
 #### Improve Model
-使用前必須確認有"原始模型"以供優化，此模型必須是本函式庫輸出之模型。
-```
-Ann = new ArtificialNeuralNetwork( input, output);
-Ann.ImportOldProject(old_project_path);
-Ann.ImproveModel(Data, maxEpochs, learnRate, 0);
-```
 
-以上為兩種主要功能，但其中要進行Improve Model之前，必須先將上次train好的模型進行儲存
+優化模式底下我們使用前必須確認有"待優化模型"以供優化，此模型必須是本函式庫輸出之模型。
+
+一開始我們已多型去宣告一個無NN架構的運算核心:
+
+    Ann = new ArtificialNeuralNetwork( input, output);
+      
+接著我們將"待優化模型"的路徑記錄下，並讓DLL自動去擷取這個模型的內容。
+
+    Ann.ImportOldProject(old_project_path);
+
+之後就和尚步驟類似，不同於最後要優化所使用的函式。
+這邊我們為了讓使用者可以在優化過程接受更多的輸出結果，讓建模更有彈性。
+
+
+    Ann.ImproveModel(Data, maxEpochs, learnRate, 0);
+
+### Save Model by manual
+
+訓練或是優化完後，如果想將此次模型保留下來，可將訓練好的模型進行儲存一套計畫
 儲存的方式為
 
 ```
 Ann.Save_network(project_path, learnRate);
 Ann.Save_H5files(project_path);
 ```
-詳細的代碼可參考資料夾中的cs檔。
+儲存成功後會在儲存目錄底下發現一個具有當下時間的新資料夾 `yyMMddHHmm_learnproj`，裡面包含一份架構檔以及參數檔。
+詳細的代碼可參考資料夾中的cs檔。    
+
+### Compute test data
+
+當訓練好後、我們可以開始嘗試加入一些新數據來看一下模型的效果。
+首先，與Improve Model相同的手法，匯入一套運算模型核心。或是你要使用當下已經訓練好的核心也可以。
+
+    //匯入新模型
+    Ann = new ArtificialNeuralNetwork( input, output);
+    Ann.ImportOldProject(old_project_path);
+
+
+之後直接將測試數據當作input進入計算。
+
+    double[] output = Ann.Compute(input);
+
+
+
 
 ## 使用注意
 1. 目前不支援二維圖像的資料格式。詳細的輸入格式可參考附件csv檔或是程式代碼
-2. 存檔後將產生一個參數檔(.h5以及)和結構檔(.ini)，請勿分開儲存避免混淆
-3. Improve Model可接受多於原始模型的輸出層，但請將多的輸出層資料插入在陣列的最後端
+2. 存檔後將產生一個參數檔(.h5以及)和架構檔(.ini)，請勿分開儲存避免與其他模型混淆
+3. Improve Model可接受多於原始模型的輸出層，但請將多的輸出層資料插入在陣列的最後端，例如
+
+        Data array [input{x1, x2, x3...,xn}, ouput{y1, y2, y3, ...ym}, new input {ym+1, ym+2, ....ym+l}]
+    
 4. 承第三點，Improve Model不可接受多於原始模型的輸入層數量。
-5. 如果不使用函式庫提供的存檔功能，可手動逐層提取參數再存承自己想要的格式。
+5. 如果不使用函式庫提供的存檔功能，可手動逐層提取參數再存成自己想要的格式。
 
 
 
