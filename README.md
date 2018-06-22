@@ -125,7 +125,7 @@ Ann.Save_H5files(project_path);
 2. 存檔後將產生一個參數檔(.h5以及)和架構檔(.ini)，請勿分開儲存避免與其他模型混淆
 3. Improve Model可接受多於原始模型的輸出層，但請將多的輸出層資料插入在陣列的最後端，例如
 
-        Data array [input{x1, x2, x3...,xn}, ouput{y1, y2, y3, ...ym}, new input {ym+1, ym+2, ....ym+l}]
+        Data array [input{x1, x2, x3...,xn}, ouput{y1, y2, y3, ...ym}, new put {ym+1, ym+2, ....ym+l}]
     
 4. 承第三點，Improve Model不可接受多於原始模型的輸入層數量。
 5. 如果不使用函式庫提供的存檔功能，可手動逐層提取參數再存成自己想要的格式。
